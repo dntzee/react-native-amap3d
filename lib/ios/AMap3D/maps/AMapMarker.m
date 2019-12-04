@@ -17,6 +17,7 @@
     BOOL _active;
     BOOL _canShowCallout;
     BOOL _enabled;
+    BOOL _lockedToScreen;
     NSInteger _zIndex;
 }
 
@@ -68,6 +69,10 @@
 
 - (void)setDescription:(NSString *)description {
     _annotation.subtitle = description;
+}
+
+- (void)setLockedToScreen:(BOOL)lockedToScreen {
+    _lockedToScreen = lockedToScreen;
 }
 
 - (void)setCoordinate:(CLLocationCoordinate2D)coordinate {
@@ -142,6 +147,13 @@
 
         [self setActive:_active];
     }
+    if (_lockedToScreen) {
+        _annotation.lockedToScreen = YES;
+        _annotation.lockedScreenPoint = _mapView.center;
+    }else{
+        _annotation.lockedToScreen = NO;
+    }
+
     return _annotationView;
 }
 
