@@ -104,6 +104,17 @@ class AMapView(context: Context) : TextureMapView(context) {
         }
 
         map.setInfoWindowAdapter(AMapInfoWindowAdapter(context, markers))
+
+        map.setOnMapLoadedListener(AMap.OnMapLoadedListener {
+            markers.forEach {
+                var mapMarker = it.value
+                if (mapMarker.lockedToScreen) {
+                    val latLng = mapMarker.marker?.position //map.getCameraPosition().target
+                    val screenPosition = map.getProjection().toScreenLocation(latLng)
+                    mapMarker.marker?.setPositionByPixels(screenPosition.x,screenPosition.y);
+                }
+            }
+        })
     }
 
     fun emitCameraChangeEvent(event: String, position: CameraPosition?) {

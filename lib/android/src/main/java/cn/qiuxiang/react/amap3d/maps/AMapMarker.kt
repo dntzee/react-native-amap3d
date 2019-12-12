@@ -89,6 +89,12 @@ class AMapMarker(context: Context) : ReactViewGroup(context), AMapOverlay {
             marker?.isInfoWindowEnable = !value
         }
 
+    var lockedToScreen: Boolean = false
+        set(value) {
+            field = value
+            //marker?.lockedToScreen = value
+        }
+
     var active: Boolean = false
         set(value) {
             field = value

@@ -3,6 +3,7 @@
 #import "AMapMarker.h"
 #import "AMapOverlay.h"
 
+
 #pragma ide diagnostic ignored "OCUnusedClassInspection"
 #pragma ide diagnostic ignored "-Woverriding-method-mismatch"
 
@@ -74,6 +75,43 @@ RCT_EXPORT_METHOD(animateTo:(nonnull NSNumber *)reactTag params:(NSDictionary *)
     }];
 }
 
+RCT_EXPORT_METHOD(addMoveAnimationWithKeyCoordinates:(nonnull NSNumber *)reactTag coordinates:(NSArray *)coordinates duration:(NSInteger)duration) {
+    
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
+        
+        NSUInteger count = [coordinates count];
+        if (count == 0) {
+            return;
+        }
+        CLLocationCoordinate2D coords[count];
+        for (int i=0; i< count; i++){
+            NSDictionary *dict = coordinates[i];
+            coords[i].latitude = [dict[@"latitude"] doubleValue];
+            coords[i].longitude = [dict[@"longitude"] doubleValue];
+        }
+
+        AMapView *mapView = (AMapView *) viewRegistry[reactTag];
+        if (mapView.animatedAnnotation == nil) {
+            mapView.animatedAnnotation = [[MAAnimatedAnnotation alloc] init];
+            mapView.animatedAnnotation.subtitle = @"moving";
+        }
+        mapView.animatedAnnotation.coordinate = coords[0];
+        [mapView addAnnotation: mapView.animatedAnnotation];
+        
+        [mapView.animatedAnnotation addMoveAnimationWithKeyCoordinates:coords count: count withDuration:duration withName:nil completeCallback:^(BOOL isFinished) {
+        }];
+
+
+    }];
+}
+
+RCT_EXPORT_METHOD(addEventz:(nonnull NSNumber *)reactTag name:(NSArray *)name location:(NSString *)location)
+{
+    RCTLogInfo(@"zPretending to create an event %@ at %@", name, location);
+}
+
+
+
 - (void)mapView:(AMapView *)mapView didSingleTappedAtCoordinate:(CLLocationCoordinate2D)coordinate {
     if (mapView.onPress) {
         mapView.onPress(@{
@@ -107,15 +145,45 @@ RCT_EXPORT_METHOD(animateTo:(nonnull NSNumber *)reactTag params:(NSDictionary *)
 
 - (MAAnnotationView *)mapView:(AMapView *)mapView viewForAnnotation:(id <MAAnnotation>)annotation {
     if ([annotation isKindOfClass:[MAPointAnnotation class]]) {
-        AMapMarker *marker = [mapView getMarker:annotation];
-        return marker.annotationView;
+        if ([annotation.subtitle isEqualToString:@"moving"]) {
+            NSString *pointReuseIndetifier = @"myReuseIndetifier";
+            MAAnnotationView *annotationView = (MAPinAnnotationView*)[mapView dequeueReusableAnnotationViewWithIdentifier:pointReuseIndetifier];
+            if (annotationView == nil)
+            {
+                annotationView = [[MAAnnotationView alloc] initWithAnnotation:annotation
+                                                              reuseIdentifier:pointReuseIndetifier];
+                
+                UIImage *image  =  [UIImage imageNamed:@"userPosition.png"]; //userPosition,iconz_amap_car
+                annotationView.image =  image;
+            }
+            
+            annotationView.canShowCallout               = YES;
+            annotationView.draggable                    = NO;
+            annotationView.rightCalloutAccessoryView    = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+            
+            return annotationView;
+        }else{
+            AMapMarker *marker = [mapView getMarker:annotation];
+            return marker.annotationView;
+        }
+
     }
+
+    
     return nil;
 }
 
 - (MAOverlayRenderer *)mapView:(MAMapView *)mapView rendererForOverlay:(id <MAOverlay>)overlay {
     if ([overlay isKindOfClass:[AMapOverlay class]]) {
         return ((AMapOverlay *) overlay).renderer;
+    }else if ([overlay isKindOfClass:[MAPolyline class]])
+    {
+        MAPolylineRenderer *polylineRenderer = [[MAPolylineRenderer alloc] initWithPolyline:overlay];
+        polylineRenderer.lineWidth    = 8.f;
+        UIImage *image = [UIImage imageNamed:@"arrowTexture"];
+        polylineRenderer.strokeImage = image;
+        return polylineRenderer;
+        
     }
     return nil;
 }
@@ -180,6 +248,8 @@ RCT_EXPORT_METHOD(animateTo:(nonnull NSNumber *)reactTag params:(NSDictionary *)
         });
     }
 }
+
+
 
 - (void)mapInitComplete:(AMapView *)mapView {
     mapView.loaded = YES;

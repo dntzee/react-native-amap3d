@@ -12,6 +12,7 @@
 
 @property(nonatomic) BOOL loaded;
 @property(nonatomic) MACoordinateRegion initialRegion;
+@property (nonatomic, strong) MAAnimatedAnnotation* animatedAnnotation;
 
 - (AMapMarker *)getMarker:(id <MAAnnotation>)annotation;
 

@@ -99,9 +99,16 @@ internal class AMapMarkerManager : ViewGroupManager<AMapMarker>() {
         marker.infoWindowDisabled = disabled
     }
 
+
     @ReactProp(name = "active")
     fun setSelected(marker: AMapMarker, active: Boolean) {
         marker.active = active
+    }
+
+
+    @ReactProp(name = "lockedToScreen")
+    fun setLockedToScreen(marker: AMapMarker, lockedToScreen: Boolean) {
+        marker.lockedToScreen = lockedToScreen
     }
 
     @ReactProp(name = "color")

@@ -16,6 +16,8 @@
     _isBoundsInit = NO;
     _markers = [NSMutableDictionary new];
     self = [super init];
+    
+    //[self initCoordinates];
     return self;
 }
 
@@ -106,5 +108,8 @@
 - (AMapMarker *)getMarker:(id <MAAnnotation>)annotation {
     return _markers[[@(annotation.hash) stringValue]];
 }
+
+
+
 
 @end

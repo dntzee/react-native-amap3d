@@ -14,7 +14,9 @@ Pod::Spec.new do |s|
 
   s.source       = { :git => package['repository']['url'] }
   s.source_files = '**/*.{h,m}'
+  s.resource = '**/*.{png,bundle,xcassets,json}'
 
   s.dependency 'React'
-  s.dependency 'AMap3DMap', "~> 6.6.0"
+  s.dependency 'AMap3DMap', "7.1.0" #, "~> 6.6.0" , "7.1.0"
+  s.dependency 'AMapNavi', "7.1.0"
 end
