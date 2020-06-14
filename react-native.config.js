@@ -1,14 +1,20 @@
-// https://github.com/react-native-community/cli/blob/master/docs/configuration.md#libraries
 module.exports = {
   dependency: {
     platforms: {
-      ios: {
-        // FIXME: Have to mock a xcodeproj to enable autolinking for ios
-        // https://github.com/react-native-community/cli/blob/master/packages/platform-ios/src/config/index.ts#L38-L45
-        project: "lib/ios/placeholder.xcodeproj"
-      },
-      android: {
-        sourceDir: "lib/android"
+      ios: { project: "lib/ios/react-native-amap3d.podspec" },
+      android: { sourceDir: "lib/android" }
+    }
+  },
+  dependencies: {
+    "react-native-amap3d": {
+      root: __dirname,
+      platforms: {
+        ios: { podspecPath: __dirname + "/lib/ios/react-native-amap3d.podspec" },
+        android: {
+          sourceDir: __dirname + "/lib/android",
+          packageImportPath: "import cn.qiuxiang.react.amap3d.AMap3DPackage;",
+          packageInstance: "new AMap3DPackage()"
+        }
       }
     }
   }
